@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "advanced_todo_backend": {
+      "main": "src/advanced_todo_backend/main.mo",
+      "type": "motoko"
+    },
+    "advanced_todo_frontend": {
+      "dependencies": [
+        "advanced_todo_backend"
+      ],
+      "source": [
+        "src/advanced_todo_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "advanced_todo_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
