@@ -1,31 +1,61 @@
-import { useState } from 'react';
-import { advanced_todo_backend } from 'declarations/advanced_todo_backend';
+import React, { useEffect, useState } from "react";
+import { advanced_todo_backend } from "../../declarations/advanced_todo_backend";
+import TodoItem from "./components/TodoItem";
 
-function App() {
-  const [greeting, setGreeting] = useState('');
+export default function App() {
+  const [items, setItems] = useState([]);
+  const [text, setText] = useState("");
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    advanced_todo_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const fetchItems = async () => {
+    const result = await advanced_todo_backend.getItems();
+    setItems(result);
+  };
+
+  const handleAdd = async () => {
+    if (text.trim()) {
+      await advanced_todo_backend.addItem(text.trim());
+      setText("");
+      fetchItems();
+    }
+  };
+
+  const handleUpdate = async (id, newText) => {
+    await advanced_todo_backend.updateItem(id, newText);
+    fetchItems();
+  };
+
+  const handleRemove = async (id) => {
+    await advanced_todo_backend.removeItem(id);
+    fetchItems();
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+    <div className="container">
+      <h1>📝 Advanced Todo</h1>
+      <div className="input-group">
+        <input
+          placeholder="Add a new task..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button onClick={handleAdd}>Add</button>
+      </div>
+
+      <div className="todo-list">
+        {items.map((item) => (
+          <TodoItem
+            key={item.id}
+            id={item.id}
+            text={item.text}
+            onUpdate={handleUpdate}
+            onRemove={handleRemove}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
-
-export default App;
